@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>显化应用 UI 设计方案</title>
+    <style>
+        /* Base Styles & Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Roboto', '思源黑体', sans-serif;
+        }
+
+        body {
+            background-color: #F8F4F0;
+            color: #4A4A4A;
+            padding: 20px;
+        }
+
+        /* Container for all phone previews */
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+        }
+
+        /* Phone frame styling */
+        .phone {
+            width: 375px;
+            height: 812px;
+            border: 1px solid #E0E0E0;
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            background-color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 80px;
+            /* Space for bottom nav when needed */
+            position: relative;
+        }
+
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            font-size: 12px;
+            color: #4A4A4A;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888888;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #FF7F50;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+        }
+
+        /* Crystal White Style Components */
+        .card {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.08));
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            padding: 12px 24px;
+            color: #4A4A4A;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #FF7F50, #FF6347);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(255, 127, 80, 0.2);
+        }
+
+        .btn-float {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 400px;
+            z-index: 99;
+            box-shadow: 0 8px 24px rgba(255, 127, 80, 0.3);
+        }
+
+        .input-field {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 16px;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 8px 2px rgba(255, 127, 80, 0.3);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 24px 16px 16px;
+            color: #4A4A4A;
+        }
+
+        /* Header styles */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Avatar */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            object-fit: cover;
+        }
+
+        /* Tab navigation */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            margin: 0 16px;
+        }
+
+        .tab {
+            padding: 12px 16px;
+            font-weight: 500;
+            color: #888888;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: #FF7F50;
+            border-bottom: 2px solid #FF7F50;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            height: 6px;
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #FF7F50, #FF6347);
+            border-radius: 3px;
+        }
+
+        /* Countdown timer */
+        .countdown {
+            display: flex;
+            align-items: center;
+            color: #FF7F50;
+            font-weight: 600;
+        }
+
+        .countdown span {
+            background-color: rgba(255, 127, 80, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
+
+        /* Product card */
+        .product-card {
+            margin: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 12px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .product-price {
+            color: #FF7F50;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        /* Grid layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* gap: 16px;
+            padding: 0 16px; */
+            gap: 12px;
+            padding: 16px;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4A4A4A;
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        /* Avatar grid for group buy */
+        .avatar-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            object-fit: cover;
+        }
+
+        /* Rating stars */
+        .rating {
+            color: #FFD700;
+            font-size: 18px;
+            margin: 4px 0;
+        }
+
+        /* Comment section */
+        .comment {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            object-fit: cover;
+            margin-right: 12px;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .comment-text {
+            color: #4A4A4A;
+            font-size: 14px;
+        }
+
+        .comment-time {
+            color: #888888;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        /* Coupon card */
+        .coupon-card {
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px;
+            border: 1px dashed #FF7F50;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coupon-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 30px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 127, 80, 0.1), transparent);
+        }
+
+        .coupon-value {
+            color: #FF7F50;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .coupon-desc {
+            font-size: 14px;
+            color: #4A4A4A;
+            margin-bottom: 8px;
+        }
+
+        .coupon-expiry {
+            font-size: 12px;
+            color: #888888;
+        }
+
+        /* Membership card */
+        .membership-card {
+            background: linear-gradient(135deg, #FF7F50, #FF6347);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 16px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 127, 80, 0.3);
+        }
+
+        .membership-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .membership-price {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .membership-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .membership-feature svg {
+            margin-right: 8px;
+        }
+
+        /* User profile header */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            padding: 24px 16px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            object-fit: cover;
+            margin-right: 16px;
+            border: 3px solid #FF7F50;
+            box-shadow: 0 4px 12px rgba(255, 127, 80, 0.2);
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .profile-stats {
+            display: flex;
+            margin-top: 12px;
+        }
+
+        .stat-item {
+            margin-right: 16px;
+            text-align: center;
+            background: rgba(255, 127, 80, 0.1);
+            padding: 8px 12px;
+            border-radius: 12px;
+            min-width: 60px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FF7F50;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888888;
+        }
+
+        /* Settings list */
+        .settings-list {
+            padding: 16px 0;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .setting-item:hover {
+            background-color: rgba(255, 127, 80, 0.05);
+        }
+
+        .setting-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .setting-info svg {
+            margin-right: 12px;
+            color: #888888;
+        }
+
+        /* Login/Signup styles */
+        .auth-container {
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+        }
+
+        .auth-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .auth-switch {
+            margin-top: 24px;
+            color: #888888;
+        }
+
+        .auth-link {
+            color: #FF7F50;
+            text-decoration: none;
+        }
+
+        /* OTP input */
+        .otp-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 24px 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Captcha modal */
+        .captcha-image {
+            width: 100%;
+            height: 80px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            font-size: 24px;
+            letter-spacing: 5px;
+            color: #4A4A4A;
+        }
+
+        /* Group buy participant grid */
+        .participant-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .participant-cell {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .participant-cell.filled {
+            background: rgba(255, 127, 80, 0.1);
+        }
+
+        .participant-cell.filled::after {
+            content: "";
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            background-color: #FF7F50;
+            border-radius: 8px;
+            border: 2px solid white;
+        }
+
+        /* Utility classes */
+        .text-muted {
+            color: #888888;
+        }
+
+        .text-small {
+            font-size: 12px;
+        }
+
+        .mb-16 {
+            margin-bottom: 16px;
+        }
+
+        .mt-16 {
+            margin-top: 16px;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .ml-8 {
+            margin-left: 8px;
+        }
+
+        .ml-12 {
+            margin-left: 12px;
+        }
+
+        .ml-16 {
+            margin-left: 16px;
+        }
+
+        .my-24 {
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Animation for charts */
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .chart-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 2s ease forwards;
+        }
+
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: linear-gradient(to bottom, #FF7F50, #FF6347);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(255, 127, 80, 0.3);
+            z-index: 99;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- SVG Icons Definitions -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="icon-home" viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </symbol>
+        <symbol id="icon-vote" viewBox="0 0 24 24">
+            <path
+                d="M18 13h-.68l-2 2h1.91L19 17H5l1.78-2h2.05l-2-2H6l-3 3v4c0 1.1.89 2 1.99 2H19c1.1 0 2-.89 2-2v-4l-3-3zm-1-5.05l-4.95 4.95-3.54-3.54 4.95-4.95L17 7.95zm-4.24-5.66L6.39 8.66c-.39.39-.39 1.02 0 1.41l4.95 4.95c.39.39 1.02.39 1.41 0l6.36-6.36c.39-.39.39-1.02 0-1.41L14.16 2.3c-.38-.4-1.01-.4-1.4-.01z" />
+        </symbol>
+        <symbol id="icon-group" viewBox="0 0 24 24">
+            <path
+                d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+        </symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24">
+            <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24">
+            <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+        </symbol>
+        <symbol id="icon-add" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </symbol>
+        <symbol id="icon-close" viewBox="0 0 24 24">
+            <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+        </symbol>
+        <symbol id="icon-arrow-right" viewBox="0 0 24 24">
+            <path d="M10 17l5-5-5-5v10z" />
+        </symbol>
+        <symbol id="icon-check" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+        </symbol>
+        <symbol id="icon-star" viewBox="0 0 24 24">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+        </symbol>
+        <symbol id="icon-share" viewBox="0 0 24 24">
+            <path
+                d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
+        </symbol>
+        <symbol id="icon-bookmark" viewBox="0 0 24 24">
+            <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+        </symbol>
+        <symbol id="icon-report" viewBox="0 0 24 24">
+            <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+        </symbol>
+        <symbol id="icon-settings" viewBox="0 0 24 24">
+            <path
+                d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+        </symbol>
+        <symbol id="icon-notification" viewBox="0 0 24 24">
+            <path
+                d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+        </symbol>
+        <symbol id="icon-camera" viewBox="0 0 24 24">
+            <path
+                d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+            <path d="M12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+        </symbol>
+        <symbol id="icon-calendar" viewBox="0 0 24 24">
+            <path
+                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" />
+        </symbol>
+        <symbol id="icon-link" viewBox="0 0 24 24">
+            <path
+                d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" />
+        </symbol>
+        <symbol id="icon-edit" viewBox="0 0 24 24">
+            <path
+                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+        </symbol>
+        <symbol id="icon-delete" viewBox="0 0 24 24">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+        </symbol>
+        <symbol id="icon-filter" viewBox="0 0 24 24">
+            <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+        </symbol>
+        <symbol id="icon-sort" viewBox="0 0 24 24">
+            <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z" />
+        </symbol>
+        <symbol id="icon-more" viewBox="0 0 24 24">
+            <path
+                d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+        </symbol>
+    </svg>
+
+    <div class="preview-container">
+        <!-- 1. 首页 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <h1 class="page-title">首页</h1>
+                    <div class="flex items-center">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-notification" />
+                        </svg>
+                        <img src="https://picsum.photos/id/237/40/40" class="avatar ml-16" alt="用户头像">
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>今日活动</h3>
+                    <p class="text-muted mt-8">参与投票赢取积分，兑换优惠券</p>
+                    <img src="https://picsum.photos/id/219/600/200" alt="活动图片" class="w-full mt-12"
+                        style="border-radius: 8px;">
+                </div>
+
+                <h2 class="section-title">推荐团购</h2>
+                <div class="grid-2">
+                    <div class="product-card" style="margin: 0pt;">
+                        <img src="https://picsum.photos/id/20/300/300" class="product-image" alt="团购商品"
+                            style="height: 150px;">
+                        <div class="product-info">
+                            <h4 class="product-title">精选咖啡豆</h4>
+                            <p class="product-price">¥89</p>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 65%"></div>
+                            </div>
+                            <p class="text-small text-muted">已拼65/100</p>
+                        </div>
+                    </div>
+                    <div class="product-card" style="margin: 0pt;">
+                        <img src="https://picsum.photos/id/42/300/300" class="product-image" alt="团购商品"
+                            style="height: 150px;">
+                        <div class="product-info">
+                            <h4 class="product-title">无线耳机</h4>
+                            <p class="product-price">¥199</p>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 30%"></div>
+                            </div>
+                            <p class="text-small text-muted">已拼30/100</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">热门投票</h2>
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h3>您更喜欢哪种咖啡口味？</h3>
+                        <span class="text-muted">1,245票</span>
+                    </div>
+                    <img src="https://picsum.photos/id/1062/600/300" alt="投票图片" class="w-full"
+                        style="border-radius: 8px;">
+                    <button class="btn btn-primary w-full mt-12">立即投票</button>
+                </div>
+
+                <div class="card mt-16">
+                    <h3>系统公告</h3>
+                    <p class="text-muted mt-8">新用户注册即送5次投票机会</p>
+                    <div class="flex justify-between mt-12">
+                        <span class="text-small text-muted">2023-06-15</span>
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-arrow-right" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 新增快捷发起投票按钮 -->
+                <div class="fab">
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-home" />
+                    </svg>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                    <span>投票</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-group" />
+                    </svg>
+                    <span>团购</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+                    <span>我的</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. 投票广场 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <h1 class="page-title">投票广场</h1>
+                    <div class="flex items-center">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-search" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">全部</div>
+                    <div class="tab">热门</div>
+                    <div class="tab">最新</div>
+                    <div class="tab">附近</div>
+                </div>
+
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h3>您更喜欢哪种咖啡口味？</h3>
+                        <span class="text-muted">1,245票</span>
+                    </div>
+                    <img src="https://picsum.photos/id/1062/600/300" alt="投票图片" class="w-full"
+                        style="border-radius: 8px;">
+                    <div class="flex justify-between mt-12">
+                        <span class="text-small text-muted">咖啡爱好者 · 2小时前</span>
+                        <button class="btn btn-primary">投票</button>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <div class="flex justify-between items-center mb-12">
+                        <h3>周末您更喜欢哪种活动？</h3>
+                        <span class="text-muted">892票</span>
+                    </div>
+                    <img src="https://picsum.photos/id/1011/600/300" alt="投票图片" class="w-full"
+                        style="border-radius: 8px;">
+                    <div class="flex justify-between mt-12">
+                        <span class="text-small text-muted">生活调查 · 5小时前</span>
+                        <button class="btn btn-primary">投票</button>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <div class="flex justify-between items-center mb-12">
+                        <h3>您希望下期团购什么商品？</h3>
+                        <span class="text-muted">2,156票</span>
+                    </div>
+                    <img src="https://picsum.photos/id/20/600/300" alt="投票图片" class="w-full"
+                        style="border-radius: 8px;">
+                    <div class="flex justify-between mt-12">
+                        <span class="text-small text-muted">团购调查 · 昨天</span>
+                        <button class="btn btn-primary">投票</button>
+                    </div>
+                </div>
+
+                <button class="btn w-full mt-16" style="border: 1px dashed #FF7F50; color: #FF7F50;">
+                    <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-add" />
+                    </svg>
+                    <span>发起投票</span>
+                </button>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-home" />
+                    </svg>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                    <span>投票</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-group" />
+                    </svg>
+                    <span>团购</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+                    <span>我的</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 3. 投票详情页 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-arrow-right" transform="rotate(180)" />
+                    </svg>
+                    <h1 class="page-title">投票详情</h1>
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-more" />
+                    </svg>
+                </div>
+
+                <img src="https://picsum.photos/id/1062/600/400" alt="投票图片" class="w-full">
+
+                <div class="card"
+                    style="margin-top: -20px; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                    <div class="flex justify-between items-center mb-16">
+                        <h2>您更喜欢哪种咖啡口味？</h2>
+                        <div class="flex">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-bookmark" />
+                            </svg>
+                            <svg class="icon ml-12" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-share" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center mb-16">
+                        <img src="https://picsum.photos/id/200/40/40" class="avatar" alt="发起人头像">
+                        <div class="ml-12">
+                            <p>咖啡爱好者</p>
+                            <p class="text-small text-muted">2小时前 · 1,245票</p>
+                        </div>
+                    </div>
+
+                    <p class="mb-16">我们正在调查用户的咖啡口味偏好，以便为下期团购提供参考。您的意见对我们非常重要！</p>
+
+                    <div class="flex items-center text-muted mb-16">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-calendar" />
+                        </svg>
+                        <span class="ml-8">截止日期: 2023-06-30</span>
+                    </div>
+
+                    <div class="flex items-center text-muted">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-link" />
+                        </svg>
+                        <span class="ml-8">相关链接: www.coffee-lovers.com</span>
+                    </div>
+
+                    <div class="flex justify-center mt-16">
+                        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-report" />
+                        </svg>
+                        <span class="text-small text-muted ml-8">举报不当内容</span>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- 详情页不需要底部导航 -->
+            <div class="bottom-nav">
+                <!-- 固定在底部的邀请按钮 -->
+                <div class="flex"
+                    style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.8)); padding: 12px 16px; border-top: 1px solid rgba(0,0,0,0.05);">
+                    <!-- 固定在底部的投票按钮 -->
+                    <button class="btn btn-primary" style="flex: 1;">立即投票</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 投票发布页 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-close" />
+                    </svg>
+                    <h1 class="page-title">发起投票</h1>
+                    <span class="text-muted">发布</span>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">基本模式</div>
+                    <div class="tab">高级模式</div>
+                </div>
+
+                <div class="card" style="border-radius: 0; margin: 0;">
+                    <div class="form-group">
+                        <label class="form-label">投票标题</label>
+                        <input type="text" class="input-field" placeholder="请输入投票标题">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">投票图片</label>
+                        <div style="border: 1px dashed #888888; border-radius: 8px; padding: 20px; text-align: center;">
+                            <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-camera" />
+                            </svg>
+                            <p class="text-muted mt-8">点击上传图片</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">简介</label>
+                        <textarea class="input-field" rows="3" placeholder="请输入投票简介"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">地址</label>
+                        <input type="text" class="input-field" placeholder="请输入相关地址">
+                    </div>
+
+                    <button class="btn btn-primary w-full mt-16">发布投票</button>
+                </div>
+            </div>
+
+            <!-- 发布页不需要底部导航 -->
+        </div>
+
+        <!-- 5. 团购中心 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <h1 class="page-title">团购中心</h1>
+                    <div class="flex items-center">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-search" />
+                        </svg>
+                        <svg class="icon ml-16" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-filter" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">全部</div>
+                    <div class="tab">进行中</div>
+                    <div class="tab">即将开始</div>
+                    <div class="tab">已结束</div>
+                </div>
+
+                <div class="product-card">
+                    <img src="https://picsum.photos/id/20/600/400" class="product-image" alt="团购商品">
+                    <div class="product-info">
+                        <h4 class="product-title">精选咖啡豆 - 哥伦比亚</h4>
+                        <div class="flex justify-between items-center mb-8">
+                            <p class="product-price">¥89 <span class="text-muted text-small"
+                                    style="text-decoration: line-through;">¥129</span></p>
+                            <div class="rating">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <span>4.8</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 65%"></div>
+                        </div>
+                        <div class="flex justify-between mt-8">
+                            <p class="text-small text-muted">已拼65/100</p>
+                            <div class="countdown">
+                                <span>23</span>:<span>58</span>:<span>42</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <img src="https://picsum.photos/id/42/600/400" class="product-image" alt="团购商品">
+                    <div class="product-info">
+                        <h4 class="product-title">无线蓝牙耳机</h4>
+                        <div class="flex justify-between items-center mb-8">
+                            <p class="product-price">¥199 <span class="text-muted text-small"
+                                    style="text-decoration: line-through;">¥299</span></p>
+                            <div class="rating">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <span>4.5</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 30%"></div>
+                        </div>
+                        <div class="flex justify-between mt-8">
+                            <p class="text-small text-muted">已拼30/100</p>
+                            <div class="countdown">
+                                <span>12</span>:<span>45</span>:<span>23</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <img src="https://picsum.photos/id/219/600/400" class="product-image" alt="团购商品">
+                    <div class="product-info">
+                        <h4 class="product-title">精品咖啡杯套装</h4>
+                        <div class="flex justify-between items-center mb-8">
+                            <p class="product-price">¥159 <span class="text-muted text-small"
+                                    style="text-decoration: line-through;">¥229</span></p>
+                            <div class="rating">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 85%"></div>
+                        </div>
+                        <div class="flex justify-between mt-8">
+                            <p class="text-small text-muted">已拼85/100</p>
+                            <div class="countdown">
+                                <span>05</span>:<span>23</span>:<span>17</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-home" />
+                    </svg>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                    <span>投票</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-group" />
+                    </svg>
+                    <span>团购</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+                    <span>我的</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 6. 团购详情页（未参与） -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-arrow-right" transform="rotate(180)" />
+                    </svg>
+                    <h1 class="page-title">团购详情</h1>
+                    <div class="flex">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-bookmark" />
+                        </svg>
+                        <svg class="icon ml-12" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-share" />
+                        </svg>
+                    </div>
+                </div>
+
+                <img src="https://picsum.photos/id/20/600/400" alt="团购商品" class="w-full">
+
+                <div class="card"
+                    style="margin-top: -20px; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                    <h2>精选咖啡豆 - 哥伦比亚</h2>
+
+                    <div class="flex items-center my-16">
+                        <div class="rating">
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <span class="text-muted ml-8">4.8 (128评价)</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-16">
+                        <p class="product-price">¥89 <span class="text-muted text-small"
+                                style="text-decoration: line-through;">¥129</span></p>
+                        <span class="text-muted">已拼65/100</span>
+                    </div>
+
+                    <div class="progress-bar mb-16">
+                        <div class="progress" style="width: 65%"></div>
+                    </div>
+
+                    <div class="countdown mb-16">
+                        <span>剩余时间: </span>
+                        <span>23</span>:<span>58</span>:<span>42</span>
+                    </div>
+
+                    <div class="mb-16">
+                        <h3 class="mb-8">商品详情</h3>
+                        <p class="text-muted">来自哥伦比亚的高品质阿拉比卡咖啡豆，中度烘焙，带有坚果和巧克力的香气，适合各种冲泡方式。</p>
+                    </div>
+
+                    <div class="mb-16">
+                        <h3 class="mb-8">规格选择</h3>
+                        <div class="flex">
+                            <button class="btn" style="margin-right: 8px;">250g</button>
+                            <button class="btn btn-primary">500g</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <h3 class="mb-16">商品评价 (128)</h3>
+
+                    <div class="comment">
+                        <img src="https://picsum.photos/id/1027/40/40" class="comment-avatar" alt="用户头像">
+                        <div class="comment-content">
+                            <div class="comment-author">咖啡爱好者</div>
+                            <div class="rating">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                            </div>
+                            <p class="comment-text">咖啡豆非常新鲜，香气浓郁，性价比超高！</p>
+                            <p class="comment-time">2023-06-10</p>
+                        </div>
+                    </div>
+
+                    <div class="comment mt-16">
+                        <img src="https://picsum.photos/id/1011/40/40" class="comment-avatar" alt="用户头像">
+                        <div class="comment-content">
+                            <div class="comment-author">每日一杯</div>
+                            <div class="rating">
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                    stroke="none">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <use xlink:href="#icon-star" />
+                                </svg>
+                            </div>
+                            <p class="comment-text">味道不错，包装也很精美，会再次购买！</p>
+                            <p class="comment-time">2023-06-08</p>
+                        </div>
+                    </div>
+
+                    <button class="btn w-full mt-16">查看全部评价</button>
+                </div>
+
+
+            </div>
+
+            <!-- 详情页不需要底部导航 -->
+            <div class="bottom-nav">
+                <!-- 固定在底部的操作按钮 -->
+                <div class="flex"
+                    style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.8)); padding: 12px 16px; border-top: 1px solid rgba(0,0,0,0.05);">
+                    <button class="btn" style="flex: 1; margin-right: 8px;">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-more" />
+                        </svg>
+                        <span>联系商家</span>
+                    </button>
+                    <button class="btn btn-primary" style="flex: 2;">立即参团</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. 团购详情页（已参与） -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-arrow-right" transform="rotate(180)" />
+                    </svg>
+                    <h1 class="page-title">团购详情</h1>
+                    <div class="flex">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-bookmark" />
+                        </svg>
+                        <svg class="icon ml-12" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-share" />
+                        </svg>
+                    </div>
+                </div>
+
+                <img src="https://picsum.photos/id/20/600/400" alt="团购商品" class="w-full">
+
+                <div class="card"
+                    style="margin-top: -20px; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                    <h2>精选咖啡豆 - 哥伦比亚</h2>
+
+                    <div class="flex items-center my-16">
+                        <div class="rating">
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                                stroke="none">
+                                <use xlink:href="#icon-star" />
+                            </svg>
+                            <span class="text-muted ml-8">4.8 (128评价)</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-16">
+                        <p class="product-price">¥89 <span class="text-muted text-small"
+                                style="text-decoration: line-through;">¥129</span></p>
+                        <span class="text-muted">已拼2/3</span>
+                    </div>
+
+                    <div class="countdown mb-16">
+                        <span>剩余时间: </span>
+                        <span>23</span>:<span>58</span>:<span>42</span>
+                    </div>
+
+                    <div class="card mb-16"
+                        style="background-color: rgba(255, 127, 80, 0.1); border: 1px dashed #FF7F50;">
+                        <h3 class="mb-8">我的拼单</h3>
+                        <p class="text-muted mb-8">您已参与本次团购，等待成团中</p>
+                        <div class="flex items-center">
+                            <img src="https://picsum.photos/id/237/40/40" class="avatar" alt="用户头像">
+                            <div class="ml-12">
+                                <p>我的订单</p>
+                                <p class="text-small text-muted">500g × 1 | ¥89</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-16">
+                        <h3 class="mb-8">拼单进度</h3>
+                        <div class="participant-grid">
+                            <div class="participant-cell filled">
+                                <img src="https://picsum.photos/id/237/40/40" class="avatar-small" alt="用户头像">
+                            </div>
+                            <div class="participant-cell filled">
+                                <img src="https://picsum.photos/id/1027/40/40" class="avatar-small" alt="用户头像">
+                            </div>
+                            <div class="participant-cell">
+                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    stroke="#888888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <use xlink:href="#icon-user" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 详情页不需要底部导航 -->
+            <div class="bottom-nav">
+                <!-- 固定在底部的邀请按钮 -->
+                <div class="flex"
+                    style="position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.8)); padding: 12px 16px; border-top: 1px solid rgba(0,0,0,0.05);">
+                    <button class="btn btn-primary" style="flex: 1;">邀请好友参团</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. 优惠兑换中心 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <h1 class="page-title">优惠兑换</h1>
+                    <div class="flex items-center">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-search" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="card"
+                    style="background: linear-gradient(135deg, rgba(255,127,80,0.1), rgba(255,127,80,0.05));">
+                    <div class="flex justify-between items-center">
+                        <h3>我的积分</h3>
+                        <span class="stat-value">1,245</span>
+                    </div>
+                    <button class="btn w-full mt-16" style="border: 1px dashed #FF7F50; color: #FF7F50;">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-coupon" />
+                        </svg>
+                        <span>查看我的优惠券</span>
+                    </button>
+                </div>
+
+                <h2 class="section-title">可兑换优惠券</h2>
+
+                <div class="coupon-card">
+                    <div class="coupon-value">¥10</div>
+                    <h3 class="coupon-desc">满¥50可用</h3>
+                    <p class="coupon-expiry">有效期至2023-12-31</p>
+                    <div class="flex justify-between mt-16">
+                        <span class="text-small">需要500积分</span>
+                        <button class="btn btn-primary">立即兑换</button>
+                    </div>
+                </div>
+
+                <div class="coupon-card">
+                    <div class="coupon-value">免费配送</div>
+                    <h3 class="coupon-desc">全场商品免运费</h3>
+                    <p class="coupon-expiry">有效期至2023-12-31</p>
+                    <div class="flex justify-between mt-16">
+                        <span class="text-small">需要300积分</span>
+                        <button class="btn btn-primary">立即兑换</button>
+                    </div>
+                </div>
+
+                <div class="coupon-card">
+                    <div class="coupon-value">投票次数+5</div>
+                    <h3 class="coupon-desc">增加5次投票机会</h3>
+                    <p class="coupon-expiry">有效期至2023-12-31</p>
+                    <div class="flex justify-between mt-16">
+                        <span class="text-small">需要200积分</span>
+                        <button class="btn btn-primary">立即兑换</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-home" />
+                    </svg>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                    <span>投票</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-group" />
+                    </svg>
+                    <span>团购</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+                    <span>我的</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 9. 会员中心 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-arrow-right" transform="rotate(180)" />
+                    </svg>
+                    <h1 class="page-title">会员特权</h1>
+                </div>
+
+                <div class="membership-card">
+                    <h3 class="membership-title">黄金会员</h3>
+                    <p class="membership-price">¥29<span class="text-small">/月</span></p>
+
+                    <div class="membership-feature">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-check" />
+                        </svg>
+                        <span>每月30次投票机会</span>
+                    </div>
+                    <div class="membership-feature">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-check" />
+                        </svg>
+                        <span>专属团购资格</span>
+                    </div>
+                    <div class="membership-feature">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-check" />
+                        </svg>
+                        <span>每月2张¥10优惠券</span>
+                    </div>
+                    <div class="membership-feature">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-check" />
+                        </svg>
+                        <span>积分获取加速20%</span>
+                    </div>
+
+                    <button class="btn w-full mt-24" style="background-color: white; color: #FF7F50;">立即订阅</button>
+                </div>
+
+                <div class="card mt-16">
+                    <h3 class="mb-16">会员特权</h3>
+
+                    <div class="flex items-center mb-16">
+                        <div
+                            style="width: 40px; height: 40px; background-color: rgba(255, 127, 80, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                            <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF7F50"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-vote" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>更多投票机会</h4>
+                            <p class="text-small text-muted">每月30次投票机会，普通会员仅10次</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center mb-16">
+                        <div
+                            style="width: 40px; height: 40px; background-color: rgba(255, 127, 80, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                            <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF7F50"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-group" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>专属团购资格</h4>
+                            <p class="text-small text-muted">提前参与限量团购，享受更低价格</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center">
+                        <div
+                            style="width: 40px; height: 40px; background-color: rgba(255, 127, 80, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                            <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF7F50"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-coupon" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>每月优惠券</h4>
+                            <p class="text-small text-muted">每月赠送2张¥10优惠券</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-home" />
+                    </svg>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                    <span>投票</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-group" />
+                    </svg>
+                    <span>团购</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+                    <span>我的</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 10. 用户中心 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+
+                <div class="profile-header">
+                    <img src="https://picsum.photos/id/237/80/80" class="profile-avatar" alt="用户头像">
+                    <div>
+                        <h2 class="profile-name">用户名</h2>
+                        <p class="text-muted">普通会员</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">15</div>
+                                <div class="stat-label">投票次数</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">1,245</div>
+                                <div class="stat-label">积分</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">3</div>
+                                <div class="stat-label">团购</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-vote" />
+                            </svg>
+                            <span>我的投票</span>
+                        </div>
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-arrow-right" />
+                        </svg>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-group" />
+                            </svg>
+                            <span>团购订单</span>
+                        </div>
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-arrow-right" />
+                        </svg>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-coupon" />
+                            </svg>
+                            <span>我的优惠券</span>
+                        </div>
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-arrow-right" />
+                        </svg>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-user" />
+                            </svg>
+                            <span>会员中心</span>
+                        </div>
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-arrow-right" />
+                        </svg>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-coupon" />
+                            </svg>
+                            <span>积分兑换</span>
+                        </div>
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-arrow-right" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-settings" />
+                            </svg>
+                            <span>设置</span>
+                        </div>
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-arrow-right" />
+                        </svg>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-report" />
+                            </svg>
+                            <span>帮助中心</span>
+                        </div>
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-arrow-right" />
+                        </svg>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <use xlink:href="#icon-report" />
+                            </svg>
+                            <span>关于我们</span>
+                        </div>
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-arrow-right" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 新增动态效果 -->
+                <div class="card mt-16"
+                    style="background: linear-gradient(135deg, rgba(255,127,80,0.1), rgba(255,127,80,0.05));">
+                    <h3 class="mb-12">本周活跃</h3>
+                    <div class="flex justify-between">
+                        <div class="text-center">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">投票</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="stat-value">2</div>
+                            <div class="stat-label">团购</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="stat-value">120</div>
+                            <div class="stat-label">积分</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-home" />
+                    </svg>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                    <span>投票</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-group" />
+                    </svg>
+                    <span>团购</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+                    <span>我的</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 11. 我的投票记录 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-arrow-right" transform="rotate(180)" />
+                    </svg>
+                    <h1 class="page-title">我的投票</h1>
+                    <div class="flex items-center">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-search" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">全部</div>
+                    <div class="tab">进行中</div>
+                    <div class="tab">已结束</div>
+                </div>
+
+                <div class="card">
+                    <div class="flex justify-between items-center mb-12">
+                        <h3>您更喜欢哪种咖啡口味？</h3>
+                        <span class="text-muted">1,245票</span>
+                    </div>
+                    <img src="https://picsum.photos/id/1062/600/300" alt="投票图片" class="w-full"
+                        style="border-radius: 8px;">
+                    <div class="flex justify-between mt-12">
+                        <span class="text-small text-muted">咖啡爱好者 · 2小时前</span>
+                        <span class="text-small" style="color: #FF7F50;">已投票</span>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <div class="flex justify-between items-center mb-12">
+                        <h3>周末您更喜欢哪种活动？</h3>
+                        <span class="text-muted">892票</span>
+                    </div>
+                    <img src="https://picsum.photos/id/1011/600/300" alt="投票图片" class="w-full"
+                        style="border-radius: 8px;">
+                    <div class="flex justify-between mt-12">
+                        <span class="text-small text-muted">生活调查 · 5小时前</span>
+                        <span class="text-small" style="color: #FF7F50;">已投票</span>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <div class="flex justify-between items-center mb-12">
+                        <h3>您希望下期团购什么商品？</h3>
+                        <span class="text-muted">2,156票</span>
+                    </div>
+                    <img src="https://picsum.photos/id/20/600/300" alt="投票图片" class="w-full"
+                        style="border-radius: 8px;">
+                    <div class="flex justify-between mt-12">
+                        <span class="text-small text-muted">团购调查 · 昨天</span>
+                        <span class="text-small" style="color: #FF7F50;">已投票</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-home" />
+                    </svg>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                    <span>投票</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-group" />
+                    </svg>
+                    <span>团购</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+                    <span>我的</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 12. 我的团购订单 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-arrow-right" transform="rotate(180)" />
+                    </svg>
+                    <h1 class="page-title">团购订单</h1>
+                    <div class="flex items-center">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-search" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">全部</div>
+                    <div class="tab">进行中</div>
+                    <div class="tab">已完成</div>
+                </div>
+
+                <div class="card">
+                    <div class="flex items-center mb-12">
+                        <img src="https://picsum.photos/id/20/80/80" class="avatar" alt="商品图片">
+                        <div class="ml-12">
+                            <h3>精选咖啡豆 - 哥伦比亚</h3>
+                            <p class="text-muted">500g × 1 | ¥89</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-small text-muted">订单号: 20230615123456</span>
+                        <span class="text-small" style="color: #FF7F50;">拼团成功</span>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <div class="flex items-center mb-12">
+                        <img src="https://picsum.photos/id/42/80/80" class="avatar" alt="商品图片">
+                        <div class="ml-12">
+                            <h3>无线蓝牙耳机</h3>
+                            <p class="text-muted">1 × 1 | ¥199</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-small text-muted">订单号: 20230615123457</span>
+                        <span class="text-small" style="color: #FF7F50;">待发货</span>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <div class="flex items-center mb-12">
+                        <img src="https://picsum.photos/id/219/80/80" class="avatar" alt="商品图片">
+                        <div class="ml-12">
+                            <h3>精品咖啡杯套装</h3>
+                            <p class="text-muted">1 × 1 | ¥159</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-small text-muted">订单号: 20230615123458</span>
+                        <span class="text-small" style="color: #888888;">拼团中</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-home" />
+                    </svg>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                    <span>投票</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-group" />
+                    </svg>
+                    <span>团购</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+                    <span>我的</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 13. 我的优惠券 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+                <div class="page-header">
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <use xlink:href="#icon-arrow-right" transform="rotate(180)" />
+                    </svg>
+                    <h1 class="page-title">我的优惠券</h1>
+                    <div class="flex items-center">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-search" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">可用</div>
+                    <div class="tab">已使用</div>
+                    <div class="tab">已过期</div>
+                </div>
+
+                <div class="coupon-card">
+                    <div class="coupon-value">¥10</div>
+                    <h3 class="coupon-desc">满¥50可用</h3>
+                    <p class="coupon-expiry">有效期至2023-12-31</p>
+                    <div class="flex justify-between mt-16">
+                        <span class="text-small">会员专享</span>
+                        <button class="btn btn-primary">立即使用</button>
+                    </div>
+                </div>
+
+                <div class="coupon-card">
+                    <div class="coupon-value">免费配送</div>
+                    <h3 class="coupon-desc">全场商品免运费</h3>
+                    <p class="coupon-expiry">有效期至2023-12-31</p>
+                    <div class="flex justify-between mt-16">
+                        <span class="text-small">无门槛</span>
+                        <button class="btn btn-primary">立即使用</button>
+                    </div>
+                </div>
+
+                <div class="coupon-card" style="opacity: 0.6;">
+                    <div class="coupon-value">投票次数+5</div>
+                    <h3 class="coupon-desc">增加5次投票机会</h3>
+                    <p class="coupon-expiry">已过期</p>
+                    <div class="flex justify-between mt-16">
+                        <span class="text-small">积分兑换</span>
+                        <button class="btn" disabled>已过期</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-home" />
+                    </svg>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-vote" />
+                    </svg>
+                    <span>投票</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-group" />
+                    </svg>
+                    <span>团购</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+                    <span>我的</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 14. 登录页 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+
+                <div class="auth-container">
+                    <svg class="auth-logo" viewBox="0 0 24 24" fill="#FF7F50">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+
+                    <h2 class="auth-title">欢迎回来</h2>
+
+                    <input type="text" class="input-field" placeholder="手机号">
+                    <input type="password" class="input-field" placeholder="密码">
+
+                    <button class="btn btn-primary w-full">登录</button>
+
+                    <div class="auth-switch">
+                        没有账号？<a href="#" class="auth-link">立即注册</a>
+                    </div>
+
+                    <div class="flex items-center my-24">
+                        <div style="flex: 1; height: 1px; background-color: rgba(0, 0, 0, 0.1);"></div>
+                        <span style="padding: 0 12px; color: #888888;">或</span>
+                        <div style="flex: 1; height: 1px; background-color: rgba(0, 0, 0, 0.1);"></div>
+                    </div>
+
+                    <button class="btn w-full">
+                        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <use xlink:href="#icon-more" />
+                        </svg>
+                        <span>其他登录方式</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15. 注册页 -->
+        <div class="phone">
+            <div class="screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>信号 电量</span>
+                </div>
+
+                <div class="auth-container">
+                    <svg class="auth-logo" viewBox="0 0 24 24" fill="#FF7F50">
+                        <use xlink:href="#icon-user" />
+                    </svg>
+
+                    <h2 class="auth-title">创建账号</h2>
+
+                    <input type="text" class="input-field" placeholder="手机号">
+
+                    <div class="captcha-image">A7B9</div>
+                    <input type="text" class="input-field" placeholder="验证码">
+
+                    <button class="btn btn-primary w-full">获取验证码</button>
+
+                    <div class="auth-switch">
+                        已有账号？<a href="#" class="auth-link">立即登录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to animate the chart line
+        document.addEventListener('DOMContentLoaded', function () {
+            // This is just a placeholder for any interactive functionality
+            // In a real app, you would have more complex logic here
+            console.log('Manifestation App UI loaded');
+
+            // Simulate chart animation
+            const chartLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            chartLine.classList.add('chart-line');
+            // You would add this to an SVG element in a real implementation
+        });
+    </script>
+</body>
+
+</html>
